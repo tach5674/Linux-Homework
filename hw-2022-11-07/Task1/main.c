@@ -4,7 +4,8 @@
 
 int main(int argc, char* argv[]){
 	if(argc < 2){
-		printf("%s\n", "No args");
+		char* err = "No args\n";
+		write(2, err, sizeof(err));
 		return 1;
 	}
 	int fd;
@@ -14,23 +15,19 @@ int main(int argc, char* argv[]){
 		//close(fd);
 		return 2;
  	}
-	char buff;
-	while(read(fd, &buff, sizeof(buff)) > 0){
-		if(buff >= 'a' && buff <= 'z'){
-			buff -= 32;
-			lseek(fd, -1, SEEK_CUR);
-			write(fd, &buff, sizeof(buff));
-			continue;
+	char buff[32];
+	int n;
+	while((n = read(fd, &buff, sizeof(buff))) > 0){
+		for(int i = 0; i < n; ++i){
+			if(buff[i] >= 'a' && buff[i] <= 'z'){
+				buff[i] -= 32;
+			}
+			if(buff[i] >= '0' && buff[i] <= '9'){
+				buff[i] = '_';
+			}
 		}
-		if(buff >= 'A' && buff <= 'Z'){
-			lseek(fd, -1, SEEK_CUR);
-			write(fd, &buff, sizeof(buff));
-			continue;
-		}
-		if(buff >= '0' && buff <= '9'){
-			lseek(fd, -1, SEEK_CUR);
-			write(fd, "_", sizeof(buff));
-		}
+		lseek(fd, -n, SEEK_CUR);
+		write(fd, &buff, n);
 	}
 	close(fd);
 	return 0;
