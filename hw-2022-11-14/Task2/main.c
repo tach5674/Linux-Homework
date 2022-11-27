@@ -4,14 +4,14 @@
 int main(void){
 	int fd[2];
 	pipe(fd);
-	char buff = 'a';
 	int n = 1;
-	write(fd[1], &buff, 1);
-	while(n){
-		if(write(fd[1], &buff, 1) < 0)
-			break;
+	char buff[1000];
+	buff[0] = 'a'; 
+	while(write(fd[1], &buff, n) > 0){
+		for(int i = 0; i < n; ++i){
+			buff[i] = 'a';
+		}
 		++n;
-		
 	}
 	printf("%d", n);
 }
