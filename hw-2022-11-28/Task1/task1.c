@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <string.h>
 
 int n;
 
@@ -15,18 +16,20 @@ int main(int argc, char *argv[]) {
     write(2, buff, sizeof(buff));
     _exit(1);
   }
-  sscanf(argv[1], "%d", &n);
-  if (n < 0) {
-    char buff[20] = "Negative number\n";
-    write(2, buff, sizeof(buff));
-    _exit(1);
+  int length = strlen(argv[1]);
+  for(int i = 0; i < length; ++i){
+    if(!(argv[1][i] >= '0' && argv[1][i] <= '9')){
+      char buff[20] = "Invalid arguments\n";
+      write(2, buff, sizeof(buff));
+      _exit(1);
+    }
   }
+  sscanf(argv[1], "%d", &n);
+  
   signal(SIGINT, sighandler);
-  while (1) {
+  while (n >= 0) {
     printf("%d signals ramining\n", n);
     sleep(2);
-    if (n < 0)
-      break;
   }
 
   return 0;
